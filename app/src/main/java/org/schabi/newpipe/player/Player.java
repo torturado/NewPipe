@@ -614,6 +614,9 @@ public final class Player implements PlaybackListener, Listener {
 
         playQueue = queue;
         playQueue.init();
+        // The queue is already shuffled if playback was started in shuffle mode, and the new
+        // ExoPlayer instance needs to know about that since the UIs read the shuffle mode from it
+        simpleExoPlayer.setShuffleModeEnabled(playQueue.isShuffled());
         reloadPlayQueueManager();
 
         UIs.call(PlayerUi::initPlayback);
@@ -1305,7 +1308,10 @@ public final class Player implements PlaybackListener, Listener {
 
         if (playQueue != null) {
             if (shuffleModeEnabled) {
-                playQueue.shuffle();
+                // do not reshuffle a queue that was already shuffled before starting playback
+                if (!playQueue.isShuffled()) {
+                    playQueue.shuffle();
+                }
             } else {
                 playQueue.unshuffle();
             }

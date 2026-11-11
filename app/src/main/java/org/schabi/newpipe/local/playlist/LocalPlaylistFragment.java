@@ -68,6 +68,7 @@ import org.schabi.newpipe.util.external_communication.ShareUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -374,6 +375,8 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.id.menu_item_share_playlist) {
             createShareConfirmationDialog();
+        } else if (item.getItemId() == R.id.menu_item_shuffle_playlist) {
+            playShuffled();
         } else if (item.getItemId() == R.id.menu_item_rename_playlist) {
             createRenameDialog();
         } else if (item.getItemId() == R.id.menu_item_remove_watched) {
@@ -759,6 +762,19 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
     @Override
     public PlayQueue getPlayQueue() {
         return getPlayQueue(0);
+    }
+
+    /**
+     * Starts playing the playlist on the main player in shuffle mode, beginning with a random item.
+     */
+    private void playShuffled() {
+        final int itemCount = itemListAdapter == null ? 0 : itemListAdapter.getItemsList().size();
+        if (itemCount == 0) {
+            return;
+        }
+        final PlayQueue playQueue = getPlayQueue(ThreadLocalRandom.current().nextInt(itemCount));
+        playQueue.shuffle();
+        NavigationHelper.playOnMainPlayer(activity, playQueue);
     }
 
     private PlayQueue getPlayQueue(final int index) {

@@ -190,6 +190,7 @@
     <string name="undo">Undo</string>
     <string name="file_deleted">File deleted</string>
     <string name="play_all">Play All</string>
+    <string name="shuffle_play">Shuffle play</string>
     <string name="always">Always</string>
     <string name="just_once">Just Once</string>
     <string name="file">File</string>

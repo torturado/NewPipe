@@ -57,6 +57,7 @@ import org.schabi.newpipe.util.text.TextEllipsizer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -240,6 +241,8 @@ public class PlaylistFragment extends BaseListInfoFragment<StreamInfoItem, Playl
                     currentInfo == null ? List.of() : currentInfo.getThumbnails());
         } else if (itemId == R.id.menu_item_bookmark) {
             onBookmarkClicked();
+        } else if (itemId == R.id.menu_item_shuffle_playlist) {
+            playShuffled();
         } else if (itemId == R.id.menu_item_append_playlist) {
             if (currentInfo != null) {
                 disposables.add(PlaylistDialog.createCorrespondingDialog(
@@ -367,6 +370,19 @@ public class PlaylistFragment extends BaseListInfoFragment<StreamInfoItem, Playl
 
     public PlayQueue getPlayQueue() {
         return getPlayQueue(0);
+    }
+
+    /**
+     * Starts playing the playlist on the main player in shuffle mode, beginning with a random item.
+     */
+    private void playShuffled() {
+        final int itemCount = infoListAdapter.getItemsList().size();
+        if (currentInfo == null || itemCount == 0) {
+            return;
+        }
+        final PlayQueue playQueue = getPlayQueue(ThreadLocalRandom.current().nextInt(itemCount));
+        playQueue.shuffle();
+        NavigationHelper.playOnMainPlayer(activity, playQueue);
     }
 
     private PlayQueue getPlayQueue(final int index) {
